@@ -13,8 +13,8 @@ class AzulPlayer:
         self.first_tile = False
 
     def can_place_tiles(self, line_idx: int, count: int, color: str) -> bool:
-        #if not self.pattern_lines.can_place_tiles(line_idx, count, color):
-        #    return False
+        if not self.pattern_lines.can_place_tiles(line_idx, count, color):
+            return False
         if not self.wall.can_place_tiles(line_idx, color):
             return False
         return True
@@ -24,11 +24,8 @@ class AzulPlayer:
         idxs = []
         for line_idx in range(len(is_full)):
             if is_full[line_idx]:
-                points, idx = self.wall.place_in_wall(line_idx, colors[line_idx])
+                points = self.wall.place_in_wall(line_idx, colors[line_idx])
                 self.score += points
-                idxs.append(idx)
-            else:
-                idxs.append(None)
 
         for i in range(len(self.floor)):
             if i >= len(floor_scores):
@@ -46,3 +43,6 @@ class AzulPlayer:
     def extend_floor(self, overflow, color):
         for i in range(overflow):
             self.floor.append(color)
+
+    def game_over(self):
+        self.score += self.wall.endgame_points()

@@ -21,7 +21,7 @@ class PlayersPanel(tk.Frame):
         for player in self.players:
             pattern = self.adapter.get_pattern_to_draw(player.player_id)
             player.pattern_lines.draw(pattern)
-            player.wall.draw()
+            player.wall.draw(self.adapter.get_placed_tiles(player.player_id))
             player.player_label.config(text=f'Player {player.player_id}')
             player.points.set(self.adapter.get_player_points(player.player_id))
 
@@ -38,7 +38,7 @@ class CurrentPlayerPanel(tk.Frame):
         floor, first_tile = self.adapter.get_floor(self.player.player_id)
 
         self.player.pattern_lines.draw(pattern)
-        self.player.wall.draw()
+        self.player.wall.draw(self.adapter.get_placed_tiles(self.player.player_id))
         self.player.player_label.config(text='Player ' + str(self.player.player_id))
         self.player.points.set(self.adapter.get_player_points(self.player.player_id))
         self.player.floor.draw(floor, first_tile)
