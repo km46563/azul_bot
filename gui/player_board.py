@@ -32,5 +32,5 @@ class PlayerBoard(tk.Frame):
         # Bottom row: floor occupies full width under top_frame
         bottom_frame = tk.Frame(self)
         bottom_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
-        self.floor = FloorWidget(bottom_frame)
+        self.floor = FloorWidget(bottom_frame, adapter)
         self.floor.pack(side=tk.LEFT, padx=10)

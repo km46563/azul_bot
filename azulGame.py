@@ -31,9 +31,8 @@ class AzulGame:
         self.current_player = (self.current_player + 1) % self.num_players
 
     def round_over(self):
-        players_idxs = {}
         for player in self.players:
-            players_idxs[player.id] = player.round_over()
+            player.round_over()
             if player.first_tile:
                 self.current_player = player.id
 
@@ -41,7 +40,10 @@ class AzulGame:
         self.center = []
         self.picked_colors = []
         self.first_tile = -1
-        return players_idxs
+
+    def game_over(self):
+        for player in self.players:
+            player.game_over()
 
     # Factories------------------------------------------------------------------------
     def set_factories(self):
