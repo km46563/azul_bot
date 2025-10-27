@@ -1,4 +1,5 @@
-[WORK IN PROGRESS]
-This program is built to let you play Azul with greedy bot.
+To play, launch gui/main_window.py file (python3 gui/main_window.py).
 
-For now, the game is playable (human vs human), bot is not connected yet, tho.
+You can choose the number of players, bot's turn, and if you want to pick the colors in factories on your own, or to make them random.
+
+In the game, pick any tile in any factory and your pattern line where you want to put the tiles.
