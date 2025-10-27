@@ -26,7 +26,7 @@ jobs:
 
       - name: Build exe
         run: |
-          pyinstaller --onefile --windowed -n AzulGame main_window.py
+          pyinstaller --onefile --windowed -n AzulGame --paths=. main_window.py
 
       # create_release zwróci upload_url, którego użyjemy poniżej
       - name: Create GitHub Release
