@@ -4,20 +4,35 @@ from bot import Bot
 from player_model import AzulPlayer
 
 
+def players_setup(num_players, bots_turn):
+    players = []
+    for i in range(num_players):
+        if i == bots_turn:
+            players.append(Bot(i))
+        else:
+            players.append(AzulPlayer(i))
+    return players
+
+
 class AzulGame:
-    def __init__(self, num_players):
+    def __init__(self, num_players, bots_turn):
         self.num_players = num_players
+        self.bots_turn = bots_turn
         self.factories = [[] for _ in range(5)]
         self.center = []
-        self.players = [AzulPlayer(i) for i in range(num_players)]
+        self.players = players_setup(num_players, bots_turn)
         self.current_player = 0
         self.first_tile = -1
         self.picked_colors = []
         self.selection = None
 
     #Players---------------------------------------------------------------------------
+
     def get_player(self, player_id: int)-> AzulPlayer:
         return self.players[player_id]
+
+    def get_bot_id(self):
+        return self.bots_turn
 
     def get_non_current_player_ids(self):
         ids = []
@@ -118,7 +133,7 @@ class AzulGame:
 
     def is_game_over(self) -> bool:
         for player in self.players:
-            for row in player.wall:
+            for row in player.wall.wall:
                 if all(cell is not None for cell in row):
                     return True
         return False

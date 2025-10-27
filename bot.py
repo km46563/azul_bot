@@ -19,7 +19,7 @@ def possible_moves(player, factories, center) -> List[Dict]:
         for color in colors:
             count = source.count(color)
             for line_idx in range(5):
-                if player.can_place_tile(line_idx, color):
+                if player.can_place_tiles(line_idx, count, color):
                     moves.append({"source": i - 1, "color": color, "line": line_idx, "count": count})
             moves.append({"source": i - 1, "color": color, "line": -1, "count": count})
     return moves
@@ -39,8 +39,12 @@ class Bot(AzulPlayer):
         line = move["line"]
         color = move["color"]
         count = move["count"]
-        in_line = len(self.pattern_lines[line]) if line != -1 else 0
-        capacity = self.pattern_capacity[line] if line != -1 else 0
+
+        state = self.pattern_lines.get_state()
+        pattern_lines = state["pattern_lines"]
+        pattern_capacity = state["pattern_capacity"]
+        in_line = len(pattern_lines[line]) if line != -1 else 0
+        capacity = pattern_capacity[line] if line != -1 else 0
 
         # Wszytkie kafelki idą na podłogę (0 punktów)
         if line == -1:
@@ -52,38 +56,13 @@ class Bot(AzulPlayer):
 
         gain = 0
         if to_place == space_left and space_left > 0:   # Zamkniemy linię
-            col = self.wall[line].index(color)
-            placeholder = self.wall[line][col]    # Na chwilę zmieniamy pole w wallu bota
-            self.wall[line][col] = color
+            col = self.wall.wall_pattern[line].index(color)
 
-            # Liczenie punktów za przylegające kafelki
-            for i in range(len(self.pattern_lines)):
-                j = 1
-                while col - j >= 0 and self.wall[i][col - j] is not None:
-                    gain += 1
-                    j += 1
-                j = 1
-                while col + j <= 4 and self.wall[i][col + j] is not None:
-                    gain += 1
-                    j += 1
-                j = 1
-                while i - j >= 0 and self.wall[i - j][col] is not None:
-                    gain += 1
-                    j += 1
-                j = 1
-                while i + j <= 4 and self.wall[i + j][col] is not None:
-                    gain += 1
-                    j += 1
+            # Counting points for neighborous tiles
+            gain += self.wall.points_for_tile(line, col)
+            # Counting points for collecting full column/line/color
+            gain += self.wall.line_completion(line, col)
 
-            if all(self.wall[line][k] is not None for k in range((len(wall_pattern[line])))):
-                gain += 2
-            if all(self.wall[k][col] is not None for k in range(len(wall_pattern[line]))):
-                gain += 7
-            if sum(x == color for r in self.wall for x in r) == 5:
-                gain += 10
-
-
-            self.wall[line][col] = placeholder    # Przywracamy proprzednie pole
         else:   # Nie zamkniemy linii
             gain = 0
 
@@ -101,7 +80,10 @@ class Bot(AzulPlayer):
             gain = 0
 
             # Premiowanie dopełnienia swojej linii
-            if move["line"] >= 0 and len(self.pattern_lines[move["line"]]) + move["count"] == self.pattern_capacity[move["line"]]:
+            state = self.pattern_lines.get_state()
+            pattern_lines = state["pattern_lines"]
+            pattern_capacity = state["pattern_capacity"]
+            if move["line"] >= 0 and len(pattern_lines[move["line"]]) + move["count"] == pattern_capacity[move["line"]]:
                 gain += 10
             # Minus 1 punkt za kafelek '-'
             if move["source"] == -1 and "-" in center:

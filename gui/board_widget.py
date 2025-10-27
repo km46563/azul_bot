@@ -7,7 +7,7 @@ from gui.player_panel import PlayersPanel, CurrentPlayerPanel
 
 
 class BoardWidget(tk.Frame):
-    def __init__(self, master, adapter):
+    def __init__(self, master, adapter, plate_picker_mode):
         super().__init__(master)
 
         self.adapter = adapter
@@ -28,7 +28,8 @@ class BoardWidget(tk.Frame):
         self.current_player.pack(side=tk.TOP, pady=20)
 
         # Plate Picker--------------------------------------
-        self.plate_picker = PlatePicker(self, adapter)
+        self.plate_picker_mode = plate_picker_mode
+        self.plate_picker = PlatePicker(self, adapter, self.plate_picker_mode)
         self.plate_picker.pack(side=tk.TOP, fill=tk.X)
 
 
@@ -46,7 +47,7 @@ class BoardWidget(tk.Frame):
 
     def create_plate_picker(self):
         self.plate_picker.destroy()
-        self.plate_picker = PlatePicker(self, self.adapter)
+        self.plate_picker = PlatePicker(self, self.adapter, self.plate_picker_mode)
         self.plate_picker.pack(side=tk.BOTTOM, pady=20)
 
     # Clicking on factory & plate
