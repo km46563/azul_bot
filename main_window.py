@@ -22,7 +22,7 @@ def main():
     root.title("Azul")
     root.geometry("660x800+200+200")
     root.resizable(True, True)
-    ico = Image.open("icons/ikonka.jpg")
+    ico = Image.open("icons/ikonka.ico")
     photo = ImageTk.PhotoImage(ico)
     root.wm_iconphoto(False, photo)
 
