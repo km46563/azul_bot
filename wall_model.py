@@ -1,15 +1,15 @@
 from typing import List, Tuple
 
-wall_pattern = [['blue', 'yellow', 'red', 'green', 'white'],
-                ['white', 'blue', 'yellow', 'red', 'green'],
-                ['green', 'white', 'blue', 'yellow', 'red'],
-                ['red', 'green', 'white', 'blue', 'yellow'],
-                ['yellow', 'red', 'green', 'white', 'blue']]
 
 class Wall:
     def __init__(self):
         self.wall = [[None for _ in range(5)] for _ in range(5)]
         self.placed_tiles = []
+        self.wall_pattern = [['blue', 'yellow', 'red', 'green', 'white'],
+                        ['white', 'blue', 'yellow', 'red', 'green'],
+                        ['green', 'white', 'blue', 'yellow', 'red'],
+                        ['red', 'green', 'white', 'blue', 'yellow'],
+                        ['yellow', 'red', 'green', 'white', 'blue']]
 
     def can_place_tiles(self, line_idx: int, color: str) -> bool:
         if color in self.wall[line_idx]:
@@ -17,10 +17,9 @@ class Wall:
         return True
 
     def place_in_wall(self, line_idx: int, color: str) -> Tuple[int, List[int]]:
-        col = wall_pattern[line_idx].index(color)
+        col = self.wall_pattern[line_idx].index(color)
         self.wall[line_idx][col] = color
         points_added = self.points_for_tile(line_idx, col)
-        idx = [line_idx, col]
         self.placed_tiles.append(f'{line_idx}x{col}')
         return points_added
 
@@ -84,4 +83,15 @@ class Wall:
         gain += sum(is_hor_full) * 2  # 2 points for every horizontal line filled
         gain += sum(is_color_full) * 10  # 10 points for each color fully collected
 
+        return gain
+
+    def line_completion(self, line, col):
+        gain = 0
+        color = self.wall_pattern[line][col]
+        if all(self.wall[line][k] is not None for k in range((len(self.wall_pattern[line])))):
+            gain += 2
+        if all(self.wall[k][col] is not None for k in range(len(self.wall_pattern[line]))):
+            gain += 7
+        if sum(x == color for r in self.wall for x in r) == 5:
+            gain += 10
         return gain

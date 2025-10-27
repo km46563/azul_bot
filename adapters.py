@@ -1,3 +1,4 @@
+import random
 from sys import exception
 from typing import Any, Optional
 
@@ -151,7 +152,9 @@ class GameAdapter:
                 self.game.selection_reset()
 
                 # End of turn
-                self.next_turn()
+                if self.game.current_player != self.game.get_bot_id():
+                    self.game.next_turn()
+                    self.bots_turn()
 
             except Exception:
                 logger.exception("Error in pattern_clicked")
@@ -200,7 +203,10 @@ class GameAdapter:
                     self.game.selection_reset()
 
                     # End of turn
-                    self.next_turn()
+                    if self.game.current_player != self.game.get_bot_id():
+                        self.game.next_turn()
+                        self.bots_turn()
+
 
                 else:
                     logger.warning("Invalid move")
@@ -220,10 +226,24 @@ class GameAdapter:
             self.game.set_factories()
             self.start_round()
 
+    def randomize_plates(self):
+        board = self.views.get('board')
+        colors = ['red', 'green', 'blue', 'yellow', 'white']
+        for _ in range(20):
+            color = random.choice(colors)
+            self.game.append_picked_colors(color)
+        board.plate_picker.destroy()
+        self.game.set_factories()
+        self.start_round()
+
     # Game flow---------------------------------------------------------------------------
     def start_round(self):
         state = self.game.get_state()
         self._apply_state(state)
+
+        if self.game.current_player == self.game.get_bot_id():
+            self.bots_turn()
+
 
     def next_turn(self):
         board = self.views.get('board')
@@ -235,6 +255,9 @@ class GameAdapter:
             player.player_id = non_current_players[i]
         print(board.players.players[0].player_id)
         self.update_views()
+
+        if self.get_current_player() == self.game.get_bot_id():
+            self.bots_turn()
 
         if self.game.is_round_over():
             self.next_round()
@@ -251,3 +274,31 @@ class GameAdapter:
         board = self.views.get('board')
         self.game.game_over()
         board.destroy()
+
+    # Bot--------------------------------------------------------------------------------
+    def bots_turn(self):
+        if self.game.is_round_over():
+            self.next_round()
+
+        move = self.game.players[self.game.get_bot_id()].greedy_ai(self.game.get_state())
+        if move['source'] == -1:
+            self.center_clicked(move['color'])
+        else:
+            self.factory_clicked(move['source'], move['color'])
+
+        if move['line'] == -1:
+            self.floor_clicked()
+        else:
+            self.pattern_clicked(move['line'])
+
+        board = self.views.get('board')
+        self.game.next_turn()
+        board.current_player.player.player_id = self.get_current_player()
+
+        non_current_players = self.game.get_non_current_player_ids()
+        for i, player in enumerate(board.players.players):
+            player.player_id = non_current_players[i]
+        self.update_views()
+
+        if self.game.is_round_over():
+            self.next_round()

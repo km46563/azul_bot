@@ -27,11 +27,7 @@ class AzulPlayer:
                 points = self.wall.place_in_wall(line_idx, colors[line_idx])
                 self.score += points
 
-        for i in range(len(self.floor)):
-            if i >= len(floor_scores):
-                self.score -= 3
-            else:
-                self.score += floor_scores[i]
+        self.score += self.floor_scores(len(self.floor))
 
         if self.first_tile:
             self.score -= 1
@@ -43,6 +39,15 @@ class AzulPlayer:
     def extend_floor(self, overflow, color):
         for i in range(overflow):
             self.floor.append(color)
+
+    def floor_scores(self, overflow):
+        score = 0
+        for i in range(overflow):
+            if i >= len(floor_scores):
+                score -= 3
+            else:
+                score += floor_scores[i]
+        return score
 
     def game_over(self):
         self.score += self.wall.endgame_points()

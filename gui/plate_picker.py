@@ -2,10 +2,15 @@ import tkinter as tk
 
 # Choosing plates for the round
 class PlatePicker(tk.Frame):
-    def __init__(self, master, adapter, width=510, height=100):
+    def __init__(self, master, adapter, plate_picker_mode, width=510, height=100):
         super().__init__(master, width=width, height=height)
-
         self.adapter = adapter
+
+        if plate_picker_mode == 'random':
+            self.config(bg="lightyellow", highlightthickness=1, highlightbackground="black")
+            self.button = tk.Button(self, text='Start Game', command=adapter.randomize_plates)
+            self.button.pack(side=tk.LEFT)
+            return
 
         # Canvas - plate preview
         self.canvas = tk.Canvas(self, width=width, height=50, bg='lightyellow')
